@@ -35,7 +35,7 @@ public class RecipeDetailsViewModel extends AndroidViewModel {
         return recipeModelSelected;
     }
 
-    public void setRecipeModelSelected(RecipeModel recipeModel){
+    public void setRecipeModelSelected(RecipeModel recipeModel) {
         recipeModelSelected.postValue(recipeModel);
     }
 
@@ -44,7 +44,7 @@ public class RecipeDetailsViewModel extends AndroidViewModel {
         return stepModelSelected;
     }
 
-    public void setStepModelSelected(StepModel stepModel){
+    public void setStepModelSelected(StepModel stepModel) {
         stepModelSelected.postValue(stepModel);
     }
 }

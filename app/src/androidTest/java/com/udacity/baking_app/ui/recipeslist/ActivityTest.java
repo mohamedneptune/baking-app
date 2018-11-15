@@ -37,6 +37,17 @@ public class ActivityTest {
 
     @Test
     public void activityTest() {
+
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(700);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
         ViewInteraction recyclerView = onView(
                 allOf(withId(R.id.recycler_recipe),
                         childAtPosition(
@@ -44,46 +55,6 @@ public class ActivityTest {
                                 1)));
         recyclerView.perform(actionOnItemAtPosition(0, click()));
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(700);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ViewInteraction recyclerView2 = onView(
-                allOf(withId(R.id.recycler_recipe),
-                        childAtPosition(
-                                withClassName(is("android.support.constraint.ConstraintLayout")),
-                                1)));
-        recyclerView2.perform(actionOnItemAtPosition(0, click()));
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(700);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ViewInteraction recyclerView3 = onView(
-                allOf(withId(R.id.recycler_step),
-                        childAtPosition(
-                                withClassName(is("android.support.v7.widget.CardView")),
-                                0)));
-        recyclerView3.perform(actionOnItemAtPosition(0, click()));
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         ViewInteraction appCompatImageButton = onView(
                 allOf(withContentDescription("Navigate up"),
@@ -96,6 +67,21 @@ public class ActivityTest {
                         isDisplayed()));
         appCompatImageButton.perform(click());
 
+
+        try {
+            Thread.sleep(700);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction recyclerView2 = onView(
+                allOf(withId(R.id.recycler_recipe),
+                        childAtPosition(
+                                withClassName(is("android.support.constraint.ConstraintLayout")),
+                                1)));
+        recyclerView2.perform(actionOnItemAtPosition(1, click()));
+
+
         ViewInteraction appCompatImageButton2 = onView(
                 allOf(withContentDescription("Navigate up"),
                         childAtPosition(
@@ -107,14 +93,21 @@ public class ActivityTest {
                         isDisplayed()));
         appCompatImageButton2.perform(click());
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+
         try {
             Thread.sleep(700);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        ViewInteraction recyclerView3 = onView(
+                allOf(withId(R.id.recycler_recipe),
+                        childAtPosition(
+                                withClassName(is("android.support.constraint.ConstraintLayout")),
+                                1)));
+        recyclerView3.perform(actionOnItemAtPosition(2, click()));
+
+
 
         ViewInteraction appCompatImageButton3 = onView(
                 allOf(withContentDescription("Navigate up"),
@@ -127,7 +120,35 @@ public class ActivityTest {
                         isDisplayed()));
         appCompatImageButton3.perform(click());
 
+        try {
+            Thread.sleep(700);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction recyclerView4 = onView(
+                allOf(withId(R.id.recycler_recipe),
+                        childAtPosition(
+                                withClassName(is("android.support.constraint.ConstraintLayout")),
+                                1)));
+        recyclerView4.perform(actionOnItemAtPosition(3, click()));
+
+
+
+        ViewInteraction appCompatImageButton4 = onView(
+                allOf(withContentDescription("Navigate up"),
+                        childAtPosition(
+                                allOf(withId(R.id.action_bar),
+                                        childAtPosition(
+                                                withId(R.id.action_bar_container),
+                                                0)),
+                                1),
+                        isDisplayed()));
+        appCompatImageButton4.perform(click());
+
     }
+
+
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {

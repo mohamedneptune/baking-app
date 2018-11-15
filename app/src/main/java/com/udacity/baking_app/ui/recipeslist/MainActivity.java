@@ -15,7 +15,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.google.gson.Gson;
 import com.udacity.baking_app.BakingAppWidgetProvider;
 import com.udacity.baking_app.R;
 import com.udacity.baking_app.data.model.RecipeModel;
@@ -23,6 +22,7 @@ import com.udacity.baking_app.data.provider.api.recipe.dto.RecipeResponse;
 import com.udacity.baking_app.data.provider.api.recipe.mapper.RecipeMapper;
 import com.udacity.baking_app.databinding.ActivityMainBinding;
 import com.udacity.baking_app.ui.recipedetails.RecipeDetailsActivity;
+import com.udacity.baking_app.utils.Json;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity  implements MainViewAdapter.ItemClickListener{
+public class MainActivity extends AppCompatActivity implements MainViewAdapter.ItemClickListener {
 
 
     private ActivityMainBinding mBinding;
@@ -38,8 +38,9 @@ public class MainActivity extends AppCompatActivity  implements MainViewAdapter.
     private List<RecipeModel> mRecipeModelList = new LinkedList<>();
     private SharedPreferences.Editor mEditorPreference;
     private String jsonResultConvertedToString;
-    private  static final String JSON_KEY = "JSON_OBJECT_CONVERTED_TO_STRING";
+    private static final String JSON_RECIPE_KEY = "JSON_RECIPE_OBJECT_CONVERTED_TO_STRING";
     private SharedPreferences mSharedPreferences;
+    private long DEFAULTPLAYERPOSITION = -100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +57,7 @@ public class MainActivity extends AppCompatActivity  implements MainViewAdapter.
 
         mSharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         mEditorPreference = mSharedPreferences.edit();
-
-        jsonResultConvertedToString = mSharedPreferences.getString(JSON_KEY, "");
     }
-
 
     private void setupViewModel() {
         // Observe the LiveData object in the ViewModel
@@ -74,13 +72,11 @@ public class MainActivity extends AppCompatActivity  implements MainViewAdapter.
                 mRecipeModelList = recipeMapper.convertListResponseToListModel(recipeResponseList);
                 setRecyclerAdapter(mRecipeModelList);
 
+                jsonResultConvertedToString = Json.serialize(mRecipeModelList);
                 //Save RecipeList to Json
-                Gson gson = new Gson();
-                jsonResultConvertedToString = gson.toJson(mRecipeModelList);
                 mEditorPreference = mSharedPreferences.edit();
-                mEditorPreference.putString(JSON_KEY, jsonResultConvertedToString);
+                mEditorPreference.putString(JSON_RECIPE_KEY, jsonResultConvertedToString);
                 mEditorPreference.commit();
-
             }
         });
     }
@@ -111,11 +107,12 @@ public class MainActivity extends AppCompatActivity  implements MainViewAdapter.
 
         //Initialise selectedStepPosition to 0
         mEditorPreference.putInt("selected_step_position", 0);
+        mEditorPreference.putLong("player_position", DEFAULTPLAYERPOSITION);
 
 
         //Get Recipe ingredient to show in widget
         ArrayList<String> listIngredients = new ArrayList<>();
-        for(int i=0 ; i< mRecipeModelList.get(position).getIngredients().size() ; i++){
+        for (int i = 0; i < mRecipeModelList.get(position).getIngredients().size(); i++) {
             listIngredients.add(mRecipeModelList.get(position).getIngredients().get(i).getIngredient());
         }
         String ingredientString = TextUtils.join(", ", listIngredients);
@@ -126,7 +123,7 @@ public class MainActivity extends AppCompatActivity  implements MainViewAdapter.
         Intent intent = new Intent(this, BakingAppWidgetProvider.class);
         intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
         int ids[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), BakingAppWidgetProvider.class));
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         sendBroadcast(intent);
 
         // Start new Activity

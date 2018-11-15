@@ -20,11 +20,10 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class MainViewModel  extends AndroidViewModel {
+public class MainViewModel extends AndroidViewModel {
 
     private RetrofitService mRetrofitService;
     private final MutableLiveData<List<RecipeResponse>> recipeList = new MutableLiveData<>();
-
 
 
     public MainViewModel(@NonNull Application application) {

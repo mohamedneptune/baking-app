@@ -11,13 +11,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.udacity.baking_app.R;
 import com.udacity.baking_app.data.model.RecipeModel;
 import com.udacity.baking_app.databinding.ActivityDetailsBinding;
 import com.udacity.baking_app.ui.recipedetails.recipedetailsdescription.RecipeDetailsFragment;
 import com.udacity.baking_app.ui.recipedetails.recipedetailslist.RecipeDetailsListFragment;
+import com.udacity.baking_app.utils.Json;
 
 import java.lang.reflect.Type;
 import java.util.LinkedList;
@@ -25,8 +26,8 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class RecipeDetailsActivity  extends AppCompatActivity implements
-        RecipeDetailsListFragment.OnRecipeStepClickLister{
+public class RecipeDetailsActivity extends AppCompatActivity implements
+        RecipeDetailsListFragment.OnRecipeStepClickLister {
 
     private ActivityDetailsBinding mBinding;
     private RecipeDetailsViewModel mViewModel;
@@ -34,11 +35,10 @@ public class RecipeDetailsActivity  extends AppCompatActivity implements
     private List<RecipeModel> mRecipeModelList = new LinkedList<>();
     private RecipeModel mRecipeModel;
     private static final int DEFAULT_SELECTED_RECIPE = -1;
-    private boolean mTabletSize;
     private FragmentManager mFragmentManager;
     private Bundle mSavedInstanceState;
     private String jsonResultConvertedToString;
-    private  static final String JSON_KEY = "JSON_OBJECT_CONVERTED_TO_STRING";
+    private static final String JSON_RECIPE_KEY = "JSON_RECIPE_OBJECT_CONVERTED_TO_STRING";
     private SharedPreferences mSharedPreferences;
     private int mSelectedRecipePosition;
 
@@ -48,19 +48,23 @@ public class RecipeDetailsActivity  extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_details);
 
-        mSavedInstanceState  = savedInstanceState;
+        mSavedInstanceState = savedInstanceState;
 
         mViewModel = ViewModelProviders.of(this).get(RecipeDetailsViewModel.class);
 
         mSharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         mEditorPreference = mSharedPreferences.edit();
 
-        jsonResultConvertedToString = mSharedPreferences.getString(JSON_KEY, "");
-
         // GET Recipe list from sharedPreference
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<RecipeModel>>(){}.getType();
-        mRecipeModelList = gson.fromJson(jsonResultConvertedToString, type);
+        jsonResultConvertedToString = mSharedPreferences.getString(JSON_RECIPE_KEY, "");
+
+        try {
+            Type type = new TypeToken<List<RecipeModel>>() {
+            }.getType();
+            mRecipeModelList = Json.deSerializeList(jsonResultConvertedToString, type);
+        } catch (JsonParseException e) {
+            Timber.e("error " + e);
+        }
 
         //get selected recipe position  from sharedPreference
         mSelectedRecipePosition = mSharedPreferences.getInt("selected_recipe_position", DEFAULT_SELECTED_RECIPE);
@@ -86,11 +90,10 @@ public class RecipeDetailsActivity  extends AppCompatActivity implements
 
 
         mFragmentManager = getSupportFragmentManager();
-        mTabletSize = getResources().getBoolean(R.bool.isTablet);
 
         //Only create new fragments when is no previously saved state
-        if(mSavedInstanceState == null) {
-            if (mTabletSize) {
+        if (mSavedInstanceState == null) {
+            if (isTablet()) {
                 RecipeDetailsListFragment recipeDetailsListFragment = new RecipeDetailsListFragment();
                 RecipeDetailsFragment recipeDetailsFragment = new RecipeDetailsFragment();
                 mFragmentManager.beginTransaction()
@@ -113,7 +116,7 @@ public class RecipeDetailsActivity  extends AppCompatActivity implements
 
     @Override
     public void onRecipeStepSelected(int position) {
-        if(!mTabletSize){
+        if (!isTablet()) {
             Timber.i("");
             RecipeDetailsFragment recipeDetailsFragment = new RecipeDetailsFragment();
             mFragmentManager.beginTransaction()
@@ -124,7 +127,7 @@ public class RecipeDetailsActivity  extends AppCompatActivity implements
     }
 
     public void backToDetailsListFragment() {
-        if(!mTabletSize){
+        if (!isTablet()) {
             Timber.i("");
             RecipeDetailsListFragment recipeDetailsListFragment = new RecipeDetailsListFragment();
             mFragmentManager.beginTransaction()
@@ -140,14 +143,19 @@ public class RecipeDetailsActivity  extends AppCompatActivity implements
             case android.R.id.home:
                 Timber.i("home on backpressed");
                 int nbrBackStackEntry = getSupportFragmentManager().getBackStackEntryCount();
-                if(nbrBackStackEntry>0) {
+                if (nbrBackStackEntry > 0) {
                     getSupportFragmentManager().popBackStack();
                     backToDetailsListFragment();
-                }else{
+                } else {
                     finish();
                 }
                 return true;
-            default: return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
+
+    public boolean isTablet(){
+        return getResources().getBoolean(R.bool.isTablet);
     }
 }

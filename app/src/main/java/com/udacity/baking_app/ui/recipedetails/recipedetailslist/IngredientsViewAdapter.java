@@ -39,9 +39,9 @@ public class IngredientsViewAdapter extends RecyclerView.Adapter<IngredientsView
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-       holder.ingredientQuantity.setText(mIngredientModelList.get(position).getQuantity().toString());
-       holder.ingredientMeasure.setText(mIngredientModelList.get(position).getMeasure());
-       holder.ingredientName.setText(mIngredientModelList.get(position).getIngredient());
+        holder.ingredientQuantity.setText(mIngredientModelList.get(position).getQuantity().toString());
+        holder.ingredientMeasure.setText(mIngredientModelList.get(position).getMeasure());
+        holder.ingredientName.setText(mIngredientModelList.get(position).getIngredient());
     }
 
     // total number of cells

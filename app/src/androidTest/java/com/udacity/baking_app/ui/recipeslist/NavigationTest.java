@@ -39,6 +39,13 @@ public class NavigationTest {
 
     @Test
     public void navigationTest() {
+
+        try {
+            Thread.sleep(700);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         ViewInteraction textView = onView(
                 allOf(withId(R.id.recipe_name), withText("Nutella Pie"),
                         childAtPosition(

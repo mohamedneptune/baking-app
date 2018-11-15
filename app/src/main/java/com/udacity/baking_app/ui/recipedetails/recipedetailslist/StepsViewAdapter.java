@@ -39,7 +39,7 @@ public class StepsViewAdapter extends RecyclerView.Adapter<StepsViewAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-       holder.stepName.setText(mStepModelList.get(position).getShortDescription());
+        holder.stepName.setText(mStepModelList.get(position).getShortDescription());
     }
 
     // total number of cells

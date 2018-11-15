@@ -3,6 +3,7 @@ package com.udacity.baking_app.ui.recipeslist;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,19 @@ public class MainViewAdapter extends RecyclerView.Adapter<MainViewAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-       holder.recipeName.setText(mRecipeModelList.get(position).getName());
+        holder.recipeName.setText(mRecipeModelList.get(position).getName());
+        if(mRecipeModelList.get(position).getImage()!=null &&
+                !TextUtils.isEmpty(mRecipeModelList.get(position).getImage())){
+            try {
+                Picasso.with(mContext)
+                        .load(mRecipeModelList.get(position).getImage())
+                        .placeholder(R.mipmap.ic_launcher) // can also be a drawable
+                        .error(R.mipmap.ic_launcher) // will be displayed if the image cannot be loaded
+                        .into(holder.recipePicture);
+            } catch (Exception e) {
+                e.toString();
+            }
+        }
     }
 
     // total number of cells
@@ -54,10 +67,12 @@ public class MainViewAdapter extends RecyclerView.Adapter<MainViewAdapter.ViewHo
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView recipeName;
+        ImageView recipePicture;
 
         ViewHolder(View itemView) {
             super(itemView);
             recipeName = (TextView) itemView.findViewById(R.id.recipe_name);
+            recipePicture = (ImageView) itemView.findViewById(R.id.recipe_picture);
             itemView.setOnClickListener(this);
         }
 
