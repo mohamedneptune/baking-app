@@ -194,6 +194,9 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
+
+            mExoPlayer.setPlayWhenReady(true);
+
             if (mPlayerPosition > 0 && mPlayerPosition != DEFAULTPLAYERPOSITION ) {
                 Toast.makeText(getContext(), "yes", Toast.LENGTH_SHORT).show();
                 mExoPlayer.seekTo(mPlayerPosition);
@@ -217,6 +220,13 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("player_position", mPlayerPosition);
+        outState.putBoolean("play_when_ready", mPlayWhenReady);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mOrientation = this.getResources().getConfiguration().orientation;
@@ -230,8 +240,8 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
         }
 
         if (mSavedInstanceState != null) {
-            mPlayerPosition = mSharedPreferences.getLong("player_position", DEFAULTPLAYERPOSITION);
-            mPlayWhenReady = mSharedPreferences.getBoolean("play_when_ready", true);
+            mPlayerPosition = mSavedInstanceState.getLong("player_position", DEFAULTPLAYERPOSITION);
+            mPlayWhenReady = mSavedInstanceState.getBoolean("play_when_ready", true);
             //LOAD stepModel into json SharedPreference
             String jsonStepConvertedToString = mSharedPreferences.getString(JSON_STEP_KEY, "");
             Gson gson = new Gson();
@@ -252,17 +262,10 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     @Override
     public void onPause() {
         super.onPause();
-
         if (mExoPlayer != null){
             mPlayerPosition = mExoPlayer.getCurrentPosition();
+            mPlayWhenReady = mExoPlayer.getPlayWhenReady();
         }
-
-        mEditorPreference.putString("video_description", mStepModel.getDescription());
-        mEditorPreference.putString("StreamingLink", mStepModel.getVideoURL());
-        mEditorPreference.putLong("player_position", mPlayerPosition);
-        mEditorPreference.putBoolean("play_when_ready", mPlayWhenReady);
-        mEditorPreference.commit();
-
         if (Util.SDK_INT <= 23) {
             releasePlayer();
         }
@@ -299,7 +302,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
                 mViewModel.setStepModelSelected(mStepModel);
                 mEditorPreference.putInt("selected_step_position", newPosition);
                 mPlayerPosition = DEFAULTPLAYERPOSITION;
-                mEditorPreference.putLong("player_position", mPlayerPosition);
                 mEditorPreference.apply();
                 if (newPosition == 0) {
                     mBinding.btnPrevious.setEnabled(false);
@@ -315,7 +317,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
                 mViewModel.setStepModelSelected(mStepModel);
                 mEditorPreference.putInt("selected_step_position", newPosition);
                 mPlayerPosition = DEFAULTPLAYERPOSITION;
-                mEditorPreference.putLong("player_position", mPlayerPosition);
                 mEditorPreference.apply();
                 if (newPosition == 1) {
                     mBinding.btnPrevious.setEnabled(true);

@@ -41,7 +41,7 @@ public class NavigationTest {
     public void navigationTest() {
 
         try {
-            Thread.sleep(700);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
